@@ -29,13 +29,13 @@ public class Path {
      * 
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
-     * 
-     * @deprecated Need to be implemented.
+     *         
+     * @deprecated
      */
     public static Path createFastestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
-        // TODO:
+        // TODO
         return new Path(graph, arcs);
     }
 
@@ -209,12 +209,13 @@ public class Path {
      * Compute the length of this path (in meters).
      * 
      * @return Total length of the path (in meters).
-     * 
-     * @deprecated Need to be implemented.
      */
     public float getLength() {
-        // TODO:
-        return 0;
+    	float lg = 0.0F;
+    	for (Arc arc : this.arcs) {
+    		lg += arc.getLength();
+    	}
+        return lg;
     }
 
     /**
@@ -224,8 +225,6 @@ public class Path {
      * 
      * @return Time (in seconds) required to travel this path at the given speed (in
      *         kilometers-per-hour).
-     * 
-     * @deprecated Need to be implemented.
      */
     public double getTravelTime(double speed) {
         // TODO:
