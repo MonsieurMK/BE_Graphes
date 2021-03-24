@@ -68,9 +68,7 @@ public class Path {
         		arcTemp = null;
         		for (Arc arc : nodes.get(i).getSuccessors()) {
         			if (arc.getDestination().equals(nodes.get(i + 1))) {
-        				if (arcTemp == null) {
-							arcTemp = arc;
-						} else if (arc.getLength() <= arcTemp.getLength() && arc.getLength() > 0.0F) {
+        				if (arcTemp == null || arc.getLength() <= arcTemp.getLength()) {
 							arcTemp = arc;
 						}
         			}
