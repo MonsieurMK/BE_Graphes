@@ -55,7 +55,8 @@ public class Path {
             throws IllegalArgumentException {
     	if (nodes.size() < 1) {
 			return new Path(graph);
-		} else if (nodes.size() == 1) {
+		}
+    	if (nodes.size() == 1) {
 			return new Path(graph, nodes.get(0));
 		}
     	
