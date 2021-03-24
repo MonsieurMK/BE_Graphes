@@ -198,10 +198,20 @@ public class Path {
      * 
      * @return true if the path is valid, false otherwise.
      * 
-     * @deprecated Need to be implemented.
      */
     public boolean isValid() {
         // TODO:
+    	if (this.isEmpty() || (!this.isEmpty() && this.arcs.isEmpty())) {
+			return true;
+		}
+    	if (this.origin.equals(this.arcs.get(0).getOrigin())) {
+    		for (int i = 0; i < this.arcs.size() - 1; i++) {
+    			if (!this.arcs.get(i).getDestination().equals(this.arcs.get(i + 1).getOrigin())) {
+					return false;
+				}
+    		}
+    		return true;
+		}
         return false;
     }
 
