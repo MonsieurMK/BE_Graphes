@@ -39,7 +39,6 @@ public class Path {
     	if (nodes.size() == 1) {
 			return new Path(graph, nodes.get(0));
 		}
-
         Arc arcTemp;
         for (int i = 0; i < nodes.size() - 1; i++) {
         	if (nodes.get(i).hasSuccessors()) {
@@ -56,7 +55,6 @@ public class Path {
         		arcs.add(arcTemp);
         	}
         }
-        
         return new Path(graph, arcs);
     }
 
