@@ -8,6 +8,8 @@ import org.insa.graphs.model.Node;
 import org.insa.graphs.model.Path;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
@@ -18,7 +20,6 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     @Override
     protected ShortestPathSolution doRun() {
         final ShortestPathData data = getInputData();
-        // TODO:
 
         BinaryHeap tas = new BinaryHeap();
 
@@ -31,8 +32,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             if (node.equals(this.getInputData().getOrigin())) {
                 label = new Label(node, false, 0, null);
                 tas.insert(label);
-            } else if (node.equals(this.getInputData().getDestination())) {
-                labelDest = new Label(node, false, 0, null);
+            } else if (node.equals((this.getInputData().getDestination()))) {
+                labelDest = new Label(node, false, Double.POSITIVE_INFINITY, null);
                 label = labelDest;
             } else {
                 label = new Label(node, false, Double.POSITIVE_INFINITY, null);
@@ -43,65 +44,56 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         // Iterations
         ArrayList<Arc> arcs = new ArrayList<>();
         Arc succ_dest = null;
-        boolean fin = false;
         Node x;
         label = (Label) tas.findMin();
         x = label.getSommetCourant();
-        while (!x.equals(this.getInputData().getDestination())) {
+        while (!tas.isEmpty() && !x.equals(this.getInputData().getDestination())) {
             label = (Label) tas.deleteMin();
             label.setMarque(true);
             x = label.getSommetCourant();
             Label labY;
             for (Arc successeur : x.getSuccessors()) {
-                for (Label label_successeur : labels) {
-                    if (label_successeur.getSommetCourant().equals(successeur.getDestination())) {
-                        labY = label_successeur;
-                        if (!labY.isMarque()) {
-                            if (labY.getCout() > label.getCout() + successeur.getLength()) {
-                                labY.setCout(label.getCout() + successeur.getLength());
-                                //tas.insert(labY);
-                                labY.setPere(successeur);
-                            }
-                        }
-                        arcs.add(successeur);
-                        if (x.equals(this.getInputData().getDestination())) {
-                            succ_dest = successeur;
-                        }
+                labY = this.getLabelNode(labels, successeur.getDestination());
+                if (!labY.isMarque()) {
+                    if (labY.getCout() > label.getCout() + successeur.getLength()) {
+                        labY.setCout(label.getCout() + successeur.getLength());
+                        tas.insert(labY);
+                        labY.setPere(successeur);
+                        this.notifyNodeReached(successeur.getDestination());
                     }
                 }
-            }
-
-            // verif si tous sommets marqués
-            // TODO optimiser
-            fin = true;
-            for (Label label_courant : labels) {
-                if (!label_courant.isMarque()) {
-                    fin = false;
-                }
+                arcs.add(successeur);
             }
         }
+
         // Creation chemin
-        // TODO
         ArrayList<Arc> arcs_solution = new ArrayList<>();
-        Arc successeur_courant = succ_dest;
+        //Arc successeur_courant = getLabelNode(labels, this.getInputData().getDestination()).getPere();
+        Arc successeur_courant = labelDest.getPere();
+        arcs_solution.add(successeur_courant);
         Node node_courant = successeur_courant.getOrigin();
         while (successeur_courant != null) {
-            arcs.add(successeur_courant);
-            for (Label label_courant : labels) {
-                if (label_courant.getPere().equals(successeur_courant)) {
-                    node_courant = label_courant.getSommetCourant();
-                }
-            }
-            for (Label label_courant : labels) {
-                if (label_courant.getPere().getDestination().equals(node_courant)) {
-                    successeur_courant = label_courant.getPere();
-                }
+            successeur_courant = getLabelNode(labels, node_courant).getPere();
+            if (successeur_courant != null) {
+                node_courant = successeur_courant.getOrigin();
+                arcs_solution.add(successeur_courant);
             }
         }
 
-        ShortestPathSolution solution = new ShortestPathSolution(data, AbstractSolution.Status.OPTIMAL, new Path(this.getInputData().getGraph(), arcs));
+        Collections.reverse(arcs_solution);
+
+        ShortestPathSolution solution = new ShortestPathSolution(data, AbstractSolution.Status.OPTIMAL, new Path(this.getInputData().getGraph(), arcs_solution));
 
         return solution;
+    }
+
+    private Label getLabelNode(ArrayList<Label> labels, Node node) {
+        for (Label label_courant : labels) {
+            if (label_courant.getSommetCourant().equals(node)) {
+                return label_courant;
+            }
+        }
+        return null;
     }
 
 }

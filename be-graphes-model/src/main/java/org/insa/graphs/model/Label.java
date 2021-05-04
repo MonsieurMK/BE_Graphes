@@ -47,7 +47,19 @@ public class Label implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        // TODO
-        return 0;
+        return (Double.compare(this.cout, ((Label) o).cout));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null) {
+            return false;
+        } else if (o instanceof Label) {
+            Label l = (Label) o;
+            return (this.sommetCourant.equals(l.sommetCourant) && this.marque == l.marque && this.cout == l.cout && this.pere.equals(l.pere));
+        }
+        return false;
     }
 }
