@@ -36,6 +36,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 label = new Label(node, false, 0, null);
                 tas.insert(label);
                 labelsNode.put(node, label);
+                this.notifyOriginProcessed(node);
             } else {
                 label = new Label(node, false, Double.POSITIVE_INFINITY, null);
                 labelsNode.put(node, label);
@@ -53,6 +54,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             label = (Label) tas.deleteMin();
             label.setMarque(true);
             x = label.getSommetCourant();
+            this.notifyNodeMarked(x);
             Label labY;
             for (Arc successeur : x.getSuccessors()) {
                 if (!this.getInputData().isAllowed(successeur)) {
@@ -70,6 +72,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 arcs.add(successeur);
             }
         }
+        this.notifyDestinationReached(this.getInputData().getDestination());
 
         // Creation chemin
         ArrayList<Arc> arcs_solution = new ArrayList<>();
