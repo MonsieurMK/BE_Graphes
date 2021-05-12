@@ -10,6 +10,7 @@ import org.insa.graphs.model.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
@@ -20,23 +21,24 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     @Override
     protected ShortestPathSolution doRun() {
         final ShortestPathData data = getInputData();
+        HashMap<Node, Label> labelsNode = new HashMap<Node, Label>();
+
+        //this.getInputData().getMode();
 
         BinaryHeap tas = new BinaryHeap();
 
         // Initialisation
         ArrayList<Label> labels = new ArrayList<>();
         Label label;
-        Label labelDest = null;
 
         for (Node node : this.getInputData().getGraph().getNodes()) {
             if (node.equals(this.getInputData().getOrigin())) {
                 label = new Label(node, false, 0, null);
                 tas.insert(label);
-            } else if (node.equals((this.getInputData().getDestination()))) {
-                labelDest = new Label(node, false, Double.POSITIVE_INFINITY, null);
-                label = labelDest;
+                labelsNode.put(node, label);
             } else {
                 label = new Label(node, false, Double.POSITIVE_INFINITY, null);
+                labelsNode.put(node, label);
             }
             labels.add(label);
         }
@@ -53,7 +55,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             x = label.getSommetCourant();
             Label labY;
             for (Arc successeur : x.getSuccessors()) {
-                labY = this.getLabelNode(labels, successeur.getDestination());
+                if (!this.getInputData().isAllowed(successeur)) {
+                    continue;
+                }
+                labY = labelsNode.get(successeur.getDestination());
                 if (!labY.isMarque()) {
                     if (labY.getCout() > label.getCout() + successeur.getLength()) {
                         labY.setCout(label.getCout() + successeur.getLength());
@@ -68,12 +73,15 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
         // Creation chemin
         ArrayList<Arc> arcs_solution = new ArrayList<>();
-        //Arc successeur_courant = getLabelNode(labels, this.getInputData().getDestination()).getPere();
-        Arc successeur_courant = labelDest.getPere();
+        Arc successeur_courant = labelsNode.get(this.getInputData().getDestination()).getPere();
+        if (successeur_courant == null) {
+            // il n'y a pas de chemin
+            return new ShortestPathSolution(data, AbstractSolution.Status.INFEASIBLE);
+        }
         arcs_solution.add(successeur_courant);
         Node node_courant = successeur_courant.getOrigin();
         while (successeur_courant != null) {
-            successeur_courant = getLabelNode(labels, node_courant).getPere();
+            successeur_courant = labelsNode.get(node_courant).getPere();
             if (successeur_courant != null) {
                 node_courant = successeur_courant.getOrigin();
                 arcs_solution.add(successeur_courant);
@@ -85,15 +93,6 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         ShortestPathSolution solution = new ShortestPathSolution(data, AbstractSolution.Status.OPTIMAL, new Path(this.getInputData().getGraph(), arcs_solution));
 
         return solution;
-    }
-
-    private Label getLabelNode(ArrayList<Label> labels, Node node) {
-        for (Label label_courant : labels) {
-            if (label_courant.getSommetCourant().equals(node)) {
-                return label_courant;
-            }
-        }
-        return null;
     }
 
 }
