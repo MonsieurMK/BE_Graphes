@@ -66,6 +66,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                         labY.setCout(label.getCout() + successeur.getLength());
                         tas.insert(labY);
                         labY.setPere(successeur);
+                        System.out.println("cout=" + labY.getCout());
                         this.notifyNodeReached(successeur.getDestination());
                     }
                 }
