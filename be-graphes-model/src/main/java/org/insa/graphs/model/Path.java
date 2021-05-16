@@ -3,6 +3,7 @@ package org.insa.graphs.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -299,4 +300,20 @@ public class Path {
         return mtt;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Path path = (Path) o;
+        if (this.arcs.size() != path.arcs.size()) {
+            return false;
+        }
+        boolean equalsArc = true;
+        for (int i = 0; i < this.arcs.size(); i++) {
+            if (!this.arcs.get(i).equals(path.arcs.get(i))) {
+                equalsArc = false;
+            }
+        }
+        return graph.equals(path.graph) && Objects.equals(origin, path.origin) && equalsArc;
+    }
 }

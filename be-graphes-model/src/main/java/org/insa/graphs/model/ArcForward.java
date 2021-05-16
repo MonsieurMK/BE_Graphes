@@ -2,6 +2,7 @@ package org.insa.graphs.model;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Implementation of Arc that represents a "forward" arc in a graph, this is the
@@ -65,4 +66,16 @@ class ArcForward extends Arc {
         return Collections.unmodifiableList(points);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ArcForward that = (ArcForward) o;
+        return Float.compare(that.length, length) == 0 && Objects.equals(origin, that.origin) && Objects.equals(destination, that.destination) && Objects.equals(info, that.info);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(origin, destination, length, info);
+    }
 }
