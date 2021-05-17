@@ -47,7 +47,7 @@ public class Label implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        return (Double.compare(this.cout, ((Label) o).cout));
+        return (Double.compare(this.getTotalCost(), ((Label) o).getTotalCost()));
     }
 
     @Override
@@ -61,5 +61,9 @@ public class Label implements Comparable {
             return (this.sommetCourant.equals(l.sommetCourant) && this.marque == l.marque && this.cout == l.cout && this.pere.equals(l.pere));
         }
         return false;
+    }
+
+    public double getTotalCost() {
+        return this.cout;
     }
 }

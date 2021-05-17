@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class DijkstraAlgorithmTest {
+public class ShortestPathAlgorithmTest {
     public static int NB_GRAPHES = 3;
     private static String[] mapNames = {"/home/morganp/IdeaProjects/BE_Graphes/src/main/resources/cartes/carre.mapgr",
             "/home/morganp/IdeaProjects/BE_Graphes/src/main/resources/cartes/insa.mapgr",
@@ -29,6 +29,12 @@ public class DijkstraAlgorithmTest {
     private static Graph[] graphes; // 0 : carre, 1 : insa, 2 : toulouse
 
     private static ArrayList<ArcInspector> arcInspectors;
+
+     enum Algorithme {
+        BELLMAN_FORD, DIJKSTRA, A_STAR;
+    }
+
+    private static Algorithme algorithme;
 
     @BeforeClass
     public static void initAll() throws IOException {
@@ -43,6 +49,8 @@ public class DijkstraAlgorithmTest {
         // initialisation ArcInspectors
         ArcInspectorFactory arcInspectorFactory = new ArcInspectorFactory();
         arcInspectors = (ArrayList) arcInspectorFactory.getAllFilters();
+
+        algorithme = Algorithme.DIJKSTRA; // algorithm à tester
     }
 
     @Test
@@ -54,8 +62,22 @@ public class DijkstraAlgorithmTest {
 
         // algorithme dijkstra
         ShortestPathData data = new ShortestPathData(graphes[0], path.getOrigin(), path.getDestination(), arcInspectors.get(0));
-        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(data);
-        ShortestPathSolution solution = dijkstraAlgorithm.doRun();
+        ShortestPathAlgorithm algorithm;
+        switch (algorithme) {
+            case BELLMAN_FORD:
+                algorithm = new BellmanFordAlgorithm(data);
+                break;
+            case DIJKSTRA:
+                algorithm = new DijkstraAlgorithm(data);
+                break;
+            case A_STAR:
+                algorithm = new AStarAlgorithm(data);
+                break;
+            default:
+                algorithm = null;
+                break;
+        }
+        ShortestPathSolution solution = algorithm.doRun();
 
         // equals redifined in Path and Arc
         assertTrue(solution.isFeasible());
@@ -71,8 +93,22 @@ public class DijkstraAlgorithmTest {
     public void testDijkstraCarreLongueurNulle() {
         // algorithme dijkstra
         ShortestPathData data = new ShortestPathData(graphes[0], graphes[0].getNodes().get(0), graphes[0].getNodes().get(0), arcInspectors.get(0));
-        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(data);
-        ShortestPathSolution solution = dijkstraAlgorithm.doRun();
+        ShortestPathAlgorithm algorithm;
+        switch (algorithme) {
+            case BELLMAN_FORD:
+                algorithm = new BellmanFordAlgorithm(data);
+                break;
+            case DIJKSTRA:
+                algorithm = new DijkstraAlgorithm(data);
+                break;
+            case A_STAR:
+                algorithm = new AStarAlgorithm(data);
+                break;
+            default:
+                algorithm = null;
+                break;
+        }
+        ShortestPathSolution solution = algorithm.doRun();
 
         assertFalse(solution.isFeasible());
     }
@@ -86,8 +122,22 @@ public class DijkstraAlgorithmTest {
 
         // algorithme dijkstra
         ShortestPathData data = new ShortestPathData(graphes[1], path.getOrigin(), path.getDestination(), arcInspectors.get(0));
-        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(data);
-        ShortestPathSolution solution = dijkstraAlgorithm.doRun();
+        ShortestPathAlgorithm algorithm;
+        switch (algorithme) {
+            case BELLMAN_FORD:
+                algorithm = new BellmanFordAlgorithm(data);
+                break;
+            case DIJKSTRA:
+                algorithm = new DijkstraAlgorithm(data);
+                break;
+            case A_STAR:
+                algorithm = new AStarAlgorithm(data);
+                break;
+            default:
+                algorithm = null;
+                break;
+        }
+        ShortestPathSolution solution = algorithm.doRun();
 
         // equals redifined in Path and Arc
         assertTrue(solution.isFeasible());
@@ -108,8 +158,22 @@ public class DijkstraAlgorithmTest {
 
         // algorithme dijkstra
         ShortestPathData data = new ShortestPathData(graphes[1], path.getOrigin(), path.getDestination(), arcInspectors.get(0));
-        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(data);
-        ShortestPathSolution solution = dijkstraAlgorithm.doRun();
+        ShortestPathAlgorithm algorithm;
+        switch (algorithme) {
+            case BELLMAN_FORD:
+                algorithm = new BellmanFordAlgorithm(data);
+                break;
+            case DIJKSTRA:
+                algorithm = new DijkstraAlgorithm(data);
+                break;
+            case A_STAR:
+                algorithm = new AStarAlgorithm(data);
+                break;
+            default:
+                algorithm = null;
+                break;
+        }
+        ShortestPathSolution solution = algorithm.doRun();
 
         // equals redifined in Path and Arc
         assertTrue(solution.isFeasible());
@@ -130,8 +194,22 @@ public class DijkstraAlgorithmTest {
 
         // algorithme dijkstra
         ShortestPathData data = new ShortestPathData(graphes[1], path.getOrigin(), path.getDestination(), arcInspectors.get(0));
-        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(data);
-        ShortestPathSolution solution = dijkstraAlgorithm.doRun();
+        ShortestPathAlgorithm algorithm;
+        switch (algorithme) {
+            case BELLMAN_FORD:
+                algorithm = new BellmanFordAlgorithm(data);
+                break;
+            case DIJKSTRA:
+                algorithm = new DijkstraAlgorithm(data);
+                break;
+            case A_STAR:
+                algorithm = new AStarAlgorithm(data);
+                break;
+            default:
+                algorithm = null;
+                break;
+        }
+        ShortestPathSolution solution = algorithm.doRun();
 
         // equals redifined in Path and Arc
         assertTrue(solution.isFeasible());
@@ -146,20 +224,60 @@ public class DijkstraAlgorithmTest {
     @Test
     public void testDijkstraINSALongueurNulle() {
         ShortestPathData data = new ShortestPathData(graphes[1], graphes[1].getNodes().get(5), graphes[1].getNodes().get(5), arcInspectors.get(0));
-        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(data);
-        ShortestPathSolution solution = dijkstraAlgorithm.doRun();
+        ShortestPathAlgorithm algorithm;
+        switch (algorithme) {
+            case BELLMAN_FORD:
+                algorithm = new BellmanFordAlgorithm(data);
+                break;
+            case DIJKSTRA:
+                algorithm = new DijkstraAlgorithm(data);
+                break;
+            case A_STAR:
+                algorithm = new AStarAlgorithm(data);
+                break;
+            default:
+                algorithm = null;
+                break;
+        }
+        ShortestPathSolution solution = algorithm.doRun();
 
         assertFalse(solution.isFeasible());
 
         data = new ShortestPathData(graphes[1], graphes[1].getNodes().get(15), graphes[1].getNodes().get(15), arcInspectors.get(0));
-        dijkstraAlgorithm = new DijkstraAlgorithm(data);
-        solution = dijkstraAlgorithm.doRun();
+        switch (algorithme) {
+            case BELLMAN_FORD:
+                algorithm = new BellmanFordAlgorithm(data);
+                break;
+            case DIJKSTRA:
+                algorithm = new DijkstraAlgorithm(data);
+                break;
+            case A_STAR:
+                algorithm = new AStarAlgorithm(data);
+                break;
+            default:
+                algorithm = null;
+                break;
+        }
+        solution = algorithm.doRun();
 
         assertFalse(solution.isFeasible());
 
         data = new ShortestPathData(graphes[1], graphes[1].getNodes().get(105), graphes[1].getNodes().get(105), arcInspectors.get(0));
-        dijkstraAlgorithm = new DijkstraAlgorithm(data);
-        solution = dijkstraAlgorithm.doRun();
+        switch (algorithme) {
+            case BELLMAN_FORD:
+                algorithm = new BellmanFordAlgorithm(data);
+                break;
+            case DIJKSTRA:
+                algorithm = new DijkstraAlgorithm(data);
+                break;
+            case A_STAR:
+                algorithm = new AStarAlgorithm(data);
+                break;
+            default:
+                algorithm = null;
+                break;
+        }
+        solution = algorithm.doRun();
 
         assertFalse(solution.isFeasible());
     }
@@ -168,8 +286,22 @@ public class DijkstraAlgorithmTest {
     public void testDijkstraINSABikiniInfaisable() {
         // ce chemin est censé emprunter le canal du midi, en autorisant uniquement les routes accessibles en voiture
         ShortestPathData data = new ShortestPathData(graphes[1], graphes[1].getNodes().get(261), graphes[1].getNodes().get(985), arcInspectors.get(1));
-        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(data);
-        ShortestPathSolution solution = dijkstraAlgorithm.doRun();
+        ShortestPathAlgorithm algorithm;
+        switch (algorithme) {
+            case BELLMAN_FORD:
+                algorithm = new BellmanFordAlgorithm(data);
+                break;
+            case DIJKSTRA:
+                algorithm = new DijkstraAlgorithm(data);
+                break;
+            case A_STAR:
+                algorithm = new AStarAlgorithm(data);
+                break;
+            default:
+                algorithm = null;
+                break;
+        }
+        ShortestPathSolution solution = algorithm.doRun();
 
         assertFalse(solution.isFeasible());
     }
@@ -179,8 +311,22 @@ public class DijkstraAlgorithmTest {
     @Test
     public void testDijkstraToulouseSansFiltre() {
         ShortestPathData data = new ShortestPathData(graphes[2], graphes[2].getNodes().get(14109), graphes[2].getNodes().get(5948), arcInspectors.get(0));
-        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(data);
-        ShortestPathSolution solution = dijkstraAlgorithm.doRun();
+        ShortestPathAlgorithm algorithm;
+        switch (algorithme) {
+            case BELLMAN_FORD:
+                algorithm = new BellmanFordAlgorithm(data);
+                break;
+            case DIJKSTRA:
+                algorithm = new DijkstraAlgorithm(data);
+                break;
+            case A_STAR:
+                algorithm = new AStarAlgorithm(data);
+                break;
+            default:
+                algorithm = null;
+                break;
+        }
+        ShortestPathSolution solution = algorithm.doRun();
 
         assertTrue(solution.isFeasible());
         assertTrue(solution.getPath().isValid());
@@ -193,8 +339,22 @@ public class DijkstraAlgorithmTest {
     @Test
     public void testDijkstraToulouseFiltreVoitures() {
         ShortestPathData data = new ShortestPathData(graphes[2], graphes[2].getNodes().get(1003), graphes[2].getNodes().get(14021), arcInspectors.get(1));
-        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(data);
-        ShortestPathSolution solution = dijkstraAlgorithm.doRun();
+        ShortestPathAlgorithm algorithm;
+        switch (algorithme) {
+            case BELLMAN_FORD:
+                algorithm = new BellmanFordAlgorithm(data);
+                break;
+            case DIJKSTRA:
+                algorithm = new DijkstraAlgorithm(data);
+                break;
+            case A_STAR:
+                algorithm = new AStarAlgorithm(data);
+                break;
+            default:
+                algorithm = null;
+                break;
+        }
+        ShortestPathSolution solution = algorithm.doRun();
 
         assertTrue(solution.isFeasible());
         assertTrue(solution.getPath().isValid());

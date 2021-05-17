@@ -14,44 +14,37 @@ import java.util.HashMap;
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
+    private BinaryHeap tas;
+    private HashMap<Node, Label> labelsNode;
+
+    public BinaryHeap getTas() {
+        return tas;
+    }
+
+    public HashMap<Node, Label> getLabelsNode() {
+        return labelsNode;
+    }
+
     public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
+        this.labelsNode = new HashMap<Node, Label>();
+        this.tas = new BinaryHeap();
     }
 
     @Override
     protected ShortestPathSolution doRun() {
         final ShortestPathData data = getInputData();
-        HashMap<Node, Label> labelsNode = new HashMap<Node, Label>();
 
-        //this.getInputData().getMode();
-
-        BinaryHeap tas = new BinaryHeap();
-
-        // Initialisation
-        ArrayList<Label> labels = new ArrayList<>();
-        Label label;
-
-        for (Node node : this.getInputData().getGraph().getNodes()) {
-            if (node.equals(this.getInputData().getOrigin())) {
-                label = new Label(node, false, 0, null);
-                tas.insert(label);
-                labelsNode.put(node, label);
-                this.notifyOriginProcessed(node);
-            } else {
-                label = new Label(node, false, Double.POSITIVE_INFINITY, null);
-                labelsNode.put(node, label);
-            }
-            labels.add(label);
-        }
+        this.initialisation();
 
         // Iterations
         int nb_succ = 0;
         ArrayList<Arc> arcs = new ArrayList<>();
         Arc succ_dest = null;
         Node x;
-        label = (Label) tas.findMin();
+        Label label = (Label) tas.findMin();
         x = label.getSommetCourant();
-        while (!tas.isEmpty() && !x.equals(this.getInputData().getDestination())) {
+        while (!tas.isEmpty() && !x.equals(data.getDestination())) {
             label = (Label) tas.deleteMin();
             label.setMarque(true);
             x = label.getSommetCourant();
@@ -59,7 +52,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             Label labY;
             nb_succ = 0;
             for (Arc successeur : x.getSuccessors()) {
-                if (!this.getInputData().isAllowed(successeur)) {
+                if (!data.isAllowed(successeur)) {
                     continue;
                 }
                 nb_succ++;
@@ -75,11 +68,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 arcs.add(successeur);
             }
         }
-        this.notifyDestinationReached(this.getInputData().getDestination());
+        this.notifyDestinationReached(data.getDestination());
 
         // Creation chemin
         ArrayList<Arc> arcs_solution = new ArrayList<>();
-        Arc successeur_courant = labelsNode.get(this.getInputData().getDestination()).getPere();
+        Arc successeur_courant = labelsNode.get(data.getDestination()).getPere();
         if (successeur_courant == null) {
             // il n'y a pas de chemin
             return new ShortestPathSolution(data, AbstractSolution.Status.INFEASIBLE);
@@ -96,9 +89,29 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
         Collections.reverse(arcs_solution);
 
-        ShortestPathSolution solution = new ShortestPathSolution(data, AbstractSolution.Status.OPTIMAL, new Path(this.getInputData().getGraph(), arcs_solution));
+        ShortestPathSolution solution = new ShortestPathSolution(data, AbstractSolution.Status.OPTIMAL, new Path(data.getGraph(), arcs_solution));
 
         return solution;
+    }
+
+    protected void initialisation() {
+        final ShortestPathData data = getInputData();
+
+        ArrayList<Label> labels = new ArrayList<>();
+        Label label;
+
+        for (Node node : data.getGraph().getNodes()) {
+            if (node.equals(data.getOrigin())) {
+                label = new Label(node, false, 0, null);
+                tas.insert(label);
+                labelsNode.put(node, label);
+                this.notifyOriginProcessed(node);
+            } else {
+                label = new Label(node, false, Double.POSITIVE_INFINITY, null);
+                labelsNode.put(node, label);
+            }
+            labels.add(label);
+        }
     }
 
 }
