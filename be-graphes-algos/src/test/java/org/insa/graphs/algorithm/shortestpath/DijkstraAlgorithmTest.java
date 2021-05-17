@@ -174,9 +174,30 @@ public class DijkstraAlgorithmTest {
         assertFalse(solution.isFeasible());
     }
 
-    // TODO écrire tests sur cartes plus grandes (sans comparer à Bellman-Ford car trop long)
+    // pour les tests sur les grandes cartes, on peut vérifier l'ordre de grandeur de la distance
+    // et tester si les chemins sont valides
     @Test
-    public void testDijkstraToulouse() {
+    public void testDijkstraToulouseSansFiltre() {
+        ShortestPathData data = new ShortestPathData(graphes[2], graphes[2].getNodes().get(14109), graphes[2].getNodes().get(5948), arcInspectors.get(0));
+        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(data);
+        ShortestPathSolution solution = dijkstraAlgorithm.doRun();
 
+        assertTrue(solution.isFeasible());
+        assertTrue(solution.getPath().isValid());
+        assertEquals(7300.0D, solution.getPath().getLength(), 500.0D); // la distance de ce trajet devrait faire environ 7,3 km selon d'autres services
+                                                                              // de cartographie (Google Maps notamment), on accorde une incertitude de 500m
+    }
+
+    // cette fois on teste un autre trajet, en se limitant aux routes pour voitures
+    // c'est un trajet entre les stations de métro Capitole et Empalot
+    @Test
+    public void testDijkstraToulouseFiltreVoitures() {
+        ShortestPathData data = new ShortestPathData(graphes[2], graphes[2].getNodes().get(1003), graphes[2].getNodes().get(14021), arcInspectors.get(1));
+        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(data);
+        ShortestPathSolution solution = dijkstraAlgorithm.doRun();
+
+        assertTrue(solution.isFeasible());
+        assertTrue(solution.getPath().isValid());
+        assertEquals(3700.0D, solution.getPath().getLength(), 500.0D); // cette fois la distance indiquée est de 8,2 km
     }
 }
