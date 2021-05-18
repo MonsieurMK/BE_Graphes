@@ -1,5 +1,6 @@
 package org.insa.graphs.algorithm.shortestpath;
 
+import org.insa.graphs.algorithm.AbstractInputData;
 import org.insa.graphs.algorithm.AbstractSolution;
 import org.insa.graphs.algorithm.utils.BinaryHeap;
 import org.insa.graphs.model.*;
@@ -24,25 +25,31 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
 
         for (Node node : this.getInputData().getGraph().getNodes()) {
             if (node.equals(this.getInputData().getOrigin())) {
-                label = new LabelStar(node, false, 0, null, this.calculDistance(node, this.getInputData().getDestination()));
+                label = new LabelStar(node, false, 0, null, calculerCout(node));
                 this.getTas().insert(label);
                 this.getLabelsNode().put(node, label);
                 this.notifyOriginProcessed(node);
             } else {
-                label = new LabelStar(node, false, Double.POSITIVE_INFINITY, null, this.calculDistance(node, this.getInputData().getDestination()));
+                label = new LabelStar(node, false, Double.POSITIVE_INFINITY, null, calculerCout(node));
                 this.getLabelsNode().put(node, label);
             }
             labels.add(label);
         }
     }
 
-    private double calculDistance(Node origine, Node destination) {
-        double lat_a, lat_b, lon_a, lon_b;
-        lat_a = origine.getPoint().getLatitude();
-        lon_a = origine.getPoint().getLongitude();
-        lat_b = origine.getPoint().getLatitude();
-        lon_b = origine.getPoint().getLongitude();
-        return Math.sqrt(Math.pow(lat_b - lat_a, 2) + Math.pow(lon_b - lon_a, 2));
+    private double calculerCout(Node node) {
+        switch (this.data.getMode()) {
+            case TIME:
+                double maxSpeed;
+                if (this.data.getMaximumSpeed() == GraphStatistics.NO_MAXIMUM_SPEED) {
+                    maxSpeed = this.data.getGraph().getGraphInformation().getMaximumSpeed();
+                } else {
+                    maxSpeed = this.data.getMaximumSpeed();
+                }
+                return 3.6 * node.getPoint().distanceTo(this.getInputData().getDestination().getPoint())/maxSpeed;
+            default:
+                return node.getPoint().distanceTo(this.getInputData().getDestination().getPoint());
+        }
     }
 
 }

@@ -2,32 +2,30 @@ package org.insa.graphs.algorithm.shortestpath;
 
 import org.insa.graphs.algorithm.AbstractSolution;
 import org.insa.graphs.algorithm.utils.BinaryHeap;
-import org.insa.graphs.model.Arc;
-import org.insa.graphs.model.Label;
-import org.insa.graphs.model.Node;
-import org.insa.graphs.model.Path;
+import org.insa.graphs.model.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class DijkstraAlgorithm extends ShortestPathAlgorithm {
+public class DijkstraVeloAlgorithm extends ShortestPathAlgorithm {
+
+    public static final double CAR_ROAD_MULTIPLIER = 900000.0D;
 
     private BinaryHeap tas;
-    private HashMap<Node, Label> labelsNode;
+    private HashMap<Node, LabelVelo> labelsNode;
 
     public BinaryHeap getTas() {
         return tas;
     }
 
-    public HashMap<Node, Label> getLabelsNode() {
+    public HashMap<Node, LabelVelo> getLabelsNode() {
         return labelsNode;
     }
 
-    public DijkstraAlgorithm(ShortestPathData data) {
+    public DijkstraVeloAlgorithm(ShortestPathData data) {
         super(data);
-        this.labelsNode = new HashMap<Node, Label>();
+        this.labelsNode = new HashMap<Node, LabelVelo>();
         this.tas = new BinaryHeap();
     }
 
@@ -42,14 +40,14 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         ArrayList<Arc> arcs = new ArrayList<>();
         Arc succ_dest = null;
         Node x;
-        Label label = (Label) tas.findMin();
+        LabelVelo label = (LabelVelo) tas.findMin();
         x = label.getSommetCourant();
         while (!tas.isEmpty() && !x.equals(data.getDestination())) {
-            label = (Label) tas.deleteMin();
+            label = (LabelVelo) tas.deleteMin();
             label.setMarque(true);
             x = label.getSommetCourant();
             this.notifyNodeMarked(x);
-            Label labY;
+            LabelVelo labY;
             nb_succ = 0;
             for (Arc successeur : x.getSuccessors()) {
                 if (!data.isAllowed(successeur)) {
@@ -58,10 +56,15 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 nb_succ++;
                 labY = labelsNode.get(successeur.getDestination());
                 if (!labY.isMarque()) {
-                    if (labY.getCout() > label.getCout() + data.getCost(successeur)) {
-                        labY.setCout(label.getCout() + data.getCost(successeur));
-                        tas.insert(labY);
+                    if (labY.getTotalCost() > this.calculerCout(label, successeur)) {
+                        labY.setCout(this.calculerCout(label, successeur));
                         labY.setPere(successeur);
+                        if(successeur.getRoadInformation().getAccessRestrictions().getRestrictionFor(AccessRestrictions.AccessMode.MOTORCAR) == AccessRestrictions.AccessRestriction.ALLOWED) {
+                            labY.setSafeMultiplier(CAR_ROAD_MULTIPLIER);
+                        } else {
+                            labY.setSafeMultiplier(1.0D);
+                        }
+                        tas.insert(labY);
                         this.notifyNodeReached(successeur.getDestination());
                     }
                 }
@@ -94,24 +97,31 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         return solution;
     }
 
+    private double calculerCout(LabelVelo label, Arc successeur) {
+        if (successeur.getRoadInformation().getAccessRestrictions().getRestrictionFor(AccessRestrictions.AccessMode.MOTORCAR) == AccessRestrictions.AccessRestriction.ALLOWED) {
+            return label.getTotalCost() + (successeur.getLength() * CAR_ROAD_MULTIPLIER);
+        } else {
+            return label.getTotalCost() + (successeur.getLength() * 1.0D);
+        }
+    }
+
     protected void initialisation() {
         final ShortestPathData data = getInputData();
 
-        ArrayList<Label> labels = new ArrayList<>();
-        Label label;
+        ArrayList<LabelVelo> labels = new ArrayList<>();
+        LabelVelo label;
 
         for (Node node : data.getGraph().getNodes()) {
             if (node.equals(data.getOrigin())) {
-                label = new Label(node, false, 0, null);
+                label = new LabelVelo(node, false, 0, null, 1.0D); // ou 0 ?
                 tas.insert(label);
                 labelsNode.put(node, label);
                 this.notifyOriginProcessed(node);
             } else {
-                label = new Label(node, false, Double.POSITIVE_INFINITY, null);
+                label = new LabelVelo(node, false, Double.POSITIVE_INFINITY, null, CAR_ROAD_MULTIPLIER); // ou 0 ?
                 labelsNode.put(node, label);
             }
             labels.add(label);
         }
     }
-
 }

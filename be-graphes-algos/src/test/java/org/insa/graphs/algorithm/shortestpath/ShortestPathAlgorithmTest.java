@@ -1,5 +1,6 @@
 package org.insa.graphs.algorithm.shortestpath;
 
+import org.insa.graphs.algorithm.AbstractInputData;
 import org.insa.graphs.algorithm.ArcInspector;
 import org.insa.graphs.algorithm.ArcInspectorFactory;
 import org.insa.graphs.model.Graph;
@@ -31,7 +32,7 @@ public class ShortestPathAlgorithmTest {
     private static ArrayList<ArcInspector> arcInspectors;
 
      enum Algorithme {
-        BELLMAN_FORD, DIJKSTRA, A_STAR;
+        BELLMAN_FORD, DIJKSTRA, A_STAR, DIJKSTRA_V;
     }
 
     private static Algorithme algorithme;
@@ -50,7 +51,7 @@ public class ShortestPathAlgorithmTest {
         ArcInspectorFactory arcInspectorFactory = new ArcInspectorFactory();
         arcInspectors = (ArrayList) arcInspectorFactory.getAllFilters();
 
-        algorithme = Algorithme.DIJKSTRA; // algorithm à tester
+        algorithme = Algorithme.A_STAR; // algorithm à tester
     }
 
     @Test
@@ -74,7 +75,7 @@ public class ShortestPathAlgorithmTest {
                 algorithm = new AStarAlgorithm(data);
                 break;
             default:
-                algorithm = null;
+                algorithm = new DijkstraVeloAlgorithm(data);
                 break;
         }
         ShortestPathSolution solution = algorithm.doRun();
@@ -105,7 +106,7 @@ public class ShortestPathAlgorithmTest {
                 algorithm = new AStarAlgorithm(data);
                 break;
             default:
-                algorithm = null;
+                algorithm = new DijkstraVeloAlgorithm(data);
                 break;
         }
         ShortestPathSolution solution = algorithm.doRun();
@@ -134,7 +135,7 @@ public class ShortestPathAlgorithmTest {
                 algorithm = new AStarAlgorithm(data);
                 break;
             default:
-                algorithm = null;
+                algorithm = new DijkstraVeloAlgorithm(data);
                 break;
         }
         ShortestPathSolution solution = algorithm.doRun();
@@ -170,7 +171,7 @@ public class ShortestPathAlgorithmTest {
                 algorithm = new AStarAlgorithm(data);
                 break;
             default:
-                algorithm = null;
+                algorithm = new DijkstraVeloAlgorithm(data);
                 break;
         }
         ShortestPathSolution solution = algorithm.doRun();
@@ -206,7 +207,7 @@ public class ShortestPathAlgorithmTest {
                 algorithm = new AStarAlgorithm(data);
                 break;
             default:
-                algorithm = null;
+                algorithm = new DijkstraVeloAlgorithm(data);
                 break;
         }
         ShortestPathSolution solution = algorithm.doRun();
@@ -236,7 +237,7 @@ public class ShortestPathAlgorithmTest {
                 algorithm = new AStarAlgorithm(data);
                 break;
             default:
-                algorithm = null;
+                algorithm = new DijkstraVeloAlgorithm(data);
                 break;
         }
         ShortestPathSolution solution = algorithm.doRun();
@@ -255,7 +256,7 @@ public class ShortestPathAlgorithmTest {
                 algorithm = new AStarAlgorithm(data);
                 break;
             default:
-                algorithm = null;
+                algorithm = new DijkstraVeloAlgorithm(data);
                 break;
         }
         solution = algorithm.doRun();
@@ -274,7 +275,7 @@ public class ShortestPathAlgorithmTest {
                 algorithm = new AStarAlgorithm(data);
                 break;
             default:
-                algorithm = null;
+                algorithm = new DijkstraVeloAlgorithm(data);
                 break;
         }
         solution = algorithm.doRun();
@@ -298,7 +299,7 @@ public class ShortestPathAlgorithmTest {
                 algorithm = new AStarAlgorithm(data);
                 break;
             default:
-                algorithm = null;
+                algorithm = new DijkstraVeloAlgorithm(data);
                 break;
         }
         ShortestPathSolution solution = algorithm.doRun();
@@ -323,13 +324,14 @@ public class ShortestPathAlgorithmTest {
                 algorithm = new AStarAlgorithm(data);
                 break;
             default:
-                algorithm = null;
+                algorithm = new DijkstraVeloAlgorithm(data);
                 break;
         }
         ShortestPathSolution solution = algorithm.doRun();
 
         assertTrue(solution.isFeasible());
         assertTrue(solution.getPath().isValid());
+        assertEquals(AbstractInputData.Mode.LENGTH, data.getMode());
         assertEquals(7300.0D, solution.getPath().getLength(), 500.0D); // la distance de ce trajet devrait faire environ 7,3 km selon d'autres services
                                                                               // de cartographie (Google Maps notamment), on accorde une incertitude de 500m
     }
@@ -351,7 +353,7 @@ public class ShortestPathAlgorithmTest {
                 algorithm = new AStarAlgorithm(data);
                 break;
             default:
-                algorithm = null;
+                algorithm = new DijkstraVeloAlgorithm(data);
                 break;
         }
         ShortestPathSolution solution = algorithm.doRun();
