@@ -51,7 +51,7 @@ public class ShortestPathAlgorithmTest {
         ArcInspectorFactory arcInspectorFactory = new ArcInspectorFactory();
         arcInspectors = (ArrayList) arcInspectorFactory.getAllFilters();
 
-        algorithme = Algorithme.A_STAR; // algorithm à tester
+        algorithme = Algorithme.DIJKSTRA; // algorithm à tester
     }
 
     @Test

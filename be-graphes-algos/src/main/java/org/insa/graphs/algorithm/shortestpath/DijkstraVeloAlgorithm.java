@@ -10,22 +10,23 @@ import java.util.HashMap;
 
 public class DijkstraVeloAlgorithm extends ShortestPathAlgorithm {
 
-    public static final double CAR_ROAD_MULTIPLIER = 900000.0D;
+    public static double SAFE_MULTIPLIER = 1.0D;
+    public static double UNSAFE_MULTIPLIER = 20.0D;
 
     private BinaryHeap tas;
-    private HashMap<Node, LabelVelo> labelsNode;
+    private HashMap<Node, Label> labelsNode;
 
     public BinaryHeap getTas() {
         return tas;
     }
 
-    public HashMap<Node, LabelVelo> getLabelsNode() {
+    public HashMap<Node, Label> getLabelsNode() {
         return labelsNode;
     }
 
     public DijkstraVeloAlgorithm(ShortestPathData data) {
         super(data);
-        this.labelsNode = new HashMap<Node, LabelVelo>();
+        this.labelsNode = new HashMap<Node, Label>();
         this.tas = new BinaryHeap();
     }
 
@@ -36,35 +37,27 @@ public class DijkstraVeloAlgorithm extends ShortestPathAlgorithm {
         this.initialisation();
 
         // Iterations
-        int nb_succ = 0;
         ArrayList<Arc> arcs = new ArrayList<>();
         Arc succ_dest = null;
         Node x;
-        LabelVelo label = (LabelVelo) tas.findMin();
+        Label label = (Label) tas.findMin();
         x = label.getSommetCourant();
         while (!tas.isEmpty() && !x.equals(data.getDestination())) {
-            label = (LabelVelo) tas.deleteMin();
+            label = (Label) tas.deleteMin();
             label.setMarque(true);
             x = label.getSommetCourant();
             this.notifyNodeMarked(x);
-            LabelVelo labY;
-            nb_succ = 0;
+            Label labY;
             for (Arc successeur : x.getSuccessors()) {
                 if (!data.isAllowed(successeur)) {
                     continue;
                 }
-                nb_succ++;
                 labY = labelsNode.get(successeur.getDestination());
                 if (!labY.isMarque()) {
-                    if (labY.getTotalCost() > this.calculerCout(label, successeur)) {
+                    if (labY.getCout() > this.calculerCout(label, successeur)) {
                         labY.setCout(this.calculerCout(label, successeur));
-                        labY.setPere(successeur);
-                        if(successeur.getRoadInformation().getAccessRestrictions().getRestrictionFor(AccessRestrictions.AccessMode.MOTORCAR) == AccessRestrictions.AccessRestriction.ALLOWED) {
-                            labY.setSafeMultiplier(CAR_ROAD_MULTIPLIER);
-                        } else {
-                            labY.setSafeMultiplier(1.0D);
-                        }
                         tas.insert(labY);
+                        labY.setPere(successeur);
                         this.notifyNodeReached(successeur.getDestination());
                     }
                 }
@@ -97,31 +90,34 @@ public class DijkstraVeloAlgorithm extends ShortestPathAlgorithm {
         return solution;
     }
 
-    private double calculerCout(LabelVelo label, Arc successeur) {
-        if (successeur.getRoadInformation().getAccessRestrictions().getRestrictionFor(AccessRestrictions.AccessMode.MOTORCAR) == AccessRestrictions.AccessRestriction.ALLOWED) {
-            return label.getTotalCost() + (successeur.getLength() * CAR_ROAD_MULTIPLIER);
+    private double calculerCout(Label label, Arc successeur) {
+        if (label.getPere() != null && label.getPere().getRoadInformation().getAccessRestrictions().isAllowedFor(AccessRestrictions.AccessMode.MOTORCAR, AccessRestrictions.AccessRestriction.ALLOWED)) {
+            // si les voitures sont autorisées, donc pas safe
+            return label.getCout() + (data.getCost(successeur) * UNSAFE_MULTIPLIER);
         } else {
-            return label.getTotalCost() + (successeur.getLength() * 1.0D);
+            // si safe
+            return label.getCout() + (data.getCost(successeur) * SAFE_MULTIPLIER);
         }
     }
 
     protected void initialisation() {
         final ShortestPathData data = getInputData();
 
-        ArrayList<LabelVelo> labels = new ArrayList<>();
-        LabelVelo label;
+        ArrayList<Label> labels = new ArrayList<>();
+        Label label;
 
         for (Node node : data.getGraph().getNodes()) {
             if (node.equals(data.getOrigin())) {
-                label = new LabelVelo(node, false, 0, null, 1.0D); // ou 0 ?
+                label = new Label(node, false, 0, null);
                 tas.insert(label);
                 labelsNode.put(node, label);
                 this.notifyOriginProcessed(node);
             } else {
-                label = new LabelVelo(node, false, Double.POSITIVE_INFINITY, null, CAR_ROAD_MULTIPLIER); // ou 0 ?
+                label = new Label(node, false, Double.POSITIVE_INFINITY, null);
                 labelsNode.put(node, label);
             }
             labels.add(label);
         }
     }
+
 }

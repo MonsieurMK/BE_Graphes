@@ -38,7 +38,6 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         this.initialisation();
 
         // Iterations
-        int nb_succ = 0;
         ArrayList<Arc> arcs = new ArrayList<>();
         Arc succ_dest = null;
         Node x;
@@ -50,12 +49,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             x = label.getSommetCourant();
             this.notifyNodeMarked(x);
             Label labY;
-            nb_succ = 0;
             for (Arc successeur : x.getSuccessors()) {
                 if (!data.isAllowed(successeur)) {
                     continue;
                 }
-                nb_succ++;
                 labY = labelsNode.get(successeur.getDestination());
                 if (!labY.isMarque()) {
                     if (labY.getCout() > label.getCout() + data.getCost(successeur)) {

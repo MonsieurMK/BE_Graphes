@@ -206,8 +206,6 @@ public class AccessRestrictions {
      * restriction.
      * 
      * @param mode Mode for which the restriction should be checked.
-     * @param restriction Restriction to check against.
-     * 
      * @return {@code true} if the restriction of the given mode corresponds to the
      *         given restriction.
      */
